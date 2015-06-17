@@ -54,7 +54,7 @@ Class BrighttreePatientService {
 	** function to search patient on basis of createdatetime
 	*/
 	
-	function PatientSearch($CreateDateTimeStart,$CreateDateTimeEnd,$sortRequest='',$pageSize=50,$page=1)
+	function PatientSearch($CreateDateTimeStart,$CreateDateTimeEnd,$sortRequest='',$pageSize=500,$page=1)
 	{
 		$SOAPAction="http://www.brightree.com/external/PatientService/IPatientService/PatientSearch";
 		$specific_post_string='<pat:PatientSearch xmlns="http://www.brightree.com/external/PatientService">
