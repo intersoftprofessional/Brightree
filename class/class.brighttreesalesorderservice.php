@@ -3,13 +3,13 @@
 	Class: BrighttreePatientService
 */
 
-Class BrighttreePatientService {
+Class BrighttreeSalesOrderService {
 		
 	public $url;	
 	public $username;
 	public $password;
 	public $xml_post_string='<?xml version="1.0" encoding="utf-8"?>							
-                            <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:pat="http://www.brightree.com/external/PatientService" xmlns:brig="http://schemas.datacontract.org/2004/07/Brightree.ExternalAPI.CanonicalObjects.OrderEntry" xmlns:brig1="http://schemas.datacontract.org/2004/07/Brightree.ExternalAPI.CanonicalObjects.Common" xmlns:brig2="http://schemas.datacontract.org/2004/07/Brightree.ExternalAPI.CanonicalObjects.CustomField">
+                            <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sal="http://www.brightree.com/external/SalesOrderService" xmlns:brig="http://schemas.datacontract.org/2004/07/Brightree.ExternalAPI.CanonicalObjects.OrderEntry" xmlns:brig1="http://schemas.datacontract.org/2004/07/Brightree.ExternalAPI.CanonicalObjects.Common" xmlns:brig2="http://schemas.datacontract.org/2004/07/Brightree.ExternalAPI.CanonicalObjects.CustomField">
                               <soap:Body xmlns:b="http://schemas.datacontract.org/2004/07/Brightree.ExternalAPI.CanonicalObjects.OrderEntry">
                                 %s
                               </soap:Body>
@@ -25,12 +25,12 @@ Class BrighttreePatientService {
 	 ** Get Pateint By BrighttreeID
 	*/
 
-	function PatientFetchByBrightreeID($BrightreeID)
+	function SalesOrderFetchByBrightreeID($BrightreeID)
 	{
-		$SOAPAction="http://www.brightree.com/external/PatientService/IPatientService/PatientFetchByBrightreeID";
-		$specific_post_string='<PatientFetchByBrightreeID xmlns="http://www.brightree.com/external/PatientService">
+		$SOAPAction="http://www.brightree.com/external/SalesOrderService/ISalesOrderService/SalesOrderFetchByBrightreeID";
+		$specific_post_string='<SalesOrderFetchByBrightreeID xmlns="http://www.brightree.com/external/SalesOrderService">
                                   <BrightreeID>'.$BrightreeID.'</BrightreeID> 
-                                </PatientFetchByBrightreeID>';
+                                </SalesOrderFetchByBrightreeID>';
 		$xml_post_string=sprintf($this->xml_post_string,$specific_post_string);
 		return $this->getResults($SOAPAction,$xml_post_string);
 	}
@@ -39,13 +39,13 @@ Class BrighttreePatientService {
 	** function to update patient by BrighttreeID
 	*/
 	
-	function PatientUpdate($BrightreeID,$Patient)
+	function SalesOrderUpdate($BrightreeID,$sales_order)
 	{
-		$SOAPAction="http://www.brightree.com/external/PatientService/IPatientService/PatientUpdate";
-		$specific_post_string='<PatientUpdate xmlns="http://www.brightree.com/external/PatientService" >
+		$SOAPAction="http://www.brightree.com/external/SalesOrderService/ISalesOrderService/SalesOrderUpdate";
+		$specific_post_string='<SalesOrderUpdate xmlns="http://www.brightree.com/external/SalesOrderService" >
 									<BrightreeID>'.$BrightreeID.'</BrightreeID>'
-									.$Patient.
-                                '</PatientUpdate>';		
+									.$sales_order.
+                                '</SalesOrderUpdate>';		
 		$xml_post_string=sprintf($this->xml_post_string,$specific_post_string);
 		return $this->getResults($SOAPAction,$xml_post_string);		
 	}
@@ -54,18 +54,18 @@ Class BrighttreePatientService {
 	** function to search patient on basis of createdatetime
 	*/
 	
-	function PatientSearch($CreateDateTimeStart,$CreateDateTimeEnd,$sortRequest='',$pageSize=50,$page=1)
+	function SalesOrderSearch($CreateDateTimeStart,$CreateDateTimeEnd,$sortRequest='',$pageSize=1000,$page=1)
 	{
-		$SOAPAction="http://www.brightree.com/external/PatientService/IPatientService/PatientSearch";
-		$specific_post_string='<pat:PatientSearch xmlns="http://www.brightree.com/external/PatientService">
-									<pat:searchRequest>																	
+		$SOAPAction="http://www.brightree.com/external/SalesOrderService/ISalesOrderService/SalesOrderSearch";
+		$specific_post_string='<sal:SalesOrderSearch xmlns="http://www.brightree.com/external/SalesOrderService">
+									<sal:SearchParams>																	
 											<brig:CreateDateTimeEnd>'.$CreateDateTimeEnd.'</brig:CreateDateTimeEnd>
 											<brig:CreateDateTimeStart>'.$CreateDateTimeStart.'</brig:CreateDateTimeStart>											
-										</pat:searchRequest>
-										<pat:sortRequest>'.$sortRequest.'</pat:sortRequest>
-										<pat:pageSize>'.$pageSize.'</pat:pageSize>
-										<pat:page>'.$page.'</pat:page>
-                                </pat:PatientSearch>';
+										</sal:SearchParams>
+										<sal:SortParams>'.$sortRequest.'</sal:SortParams>
+										<sal:pageSize>'.$pageSize.'</sal:pageSize>
+										<sal:page>'.$page.'</sal:page>
+                                </sal:SalesOrderSearch>';
 		$xml_post_string=sprintf($this->xml_post_string,$specific_post_string);		
 		return $this->getResults($SOAPAction,$xml_post_string);		
 	}

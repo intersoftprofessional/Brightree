@@ -15,10 +15,12 @@ $xml = simplexml_load_string((string) $result);
 $totalRecords = $xml->children('s',true)->children()->PatientSearchResponse->children()->PatientSearchResult->children('a',true)->TotalItemCount;
 $records =$xml->children('s',true)->children()->PatientSearchResponse->children()->PatientSearchResult->children('a',true)->Items->children('b',true)->PatientSearchResponse;
 
-if($records && ( count($records) > 0)) {
+if($records && ( count($records) > 0)) {	
+	echo '<table border="1"><tr><th>Patient ID</th><th>Patient Name</th><th>Results</th></tr>';
 	//traverse to all records
 	foreach($records as $key => $record)
-	{	
+	{
+		echo '<tr>';
 		//get brightreeID
 		$BrightreeID = (string) $record->children('b',true)->BrightreeID;
 		
@@ -65,8 +67,16 @@ if($records && ( count($records) > 0)) {
 		$verify->verify();
 
 		$correctAddress= $verify->getArrayResponse();
+		
+		//get name of patient				
+		$patient_name_obj = $patient->children('b', true)->PatientGeneralInfo->children('b', true)->Name->children('c', true);
+		$firstname= (string) $patient_name_obj->First;
+		$lastname= (string) $patient_name_obj->Last;
 
-		if($verify->isSuccess()) {
+		
+		if($verify->isSuccess()) {		
+				
+		
 				//Now Update the correct deliveryAddress in the patient object		
 				
 				$patient->children('b',true)->PatientGeneralInfo->children('b',true)->DeliveryAddress->children('c',true)->AddressLine1 = (isset($correctAddress['AddressValidateResponse']['Address']['Address2'])) ? trim($correctAddress['AddressValidateResponse']['Address']['Address2']) : '';
@@ -89,20 +99,22 @@ if($records && ( count($records) > 0)) {
 				// Update patient object on brighttree			
 				$resultxml = simplexml_load_string((string) $obj->PatientUpdate($BrightreeID,$patientObjXML));			
 				
-				//show result
+				//show result				
 				if( (bool) $resultxml->children('s',true)->children()->PatientUpdateResponse->children()->PatientUpdateResult->children('a',true)->Success)
 				{
-					echo "Patient $BrightreeID : Updated successfully</br>";
+					echo "<td>$BrightreeID</td><td>$firstname $lastname</td><td>Updated successfully</td>";
 				}else{
-					echo "Patient $BrightreeID : ".$resultxml->children('s',true)->children()->PatientUpdateResponse->children()->PatientUpdateResult->children('a',true)->Messages." </br>";
-				}
+					echo "<td>$BrightreeID</td><td>$firstname $lastname</td><td>".$resultxml->children('s',true)->children()->PatientUpdateResponse->children()->PatientUpdateResult->children('a',true)->Messages."</td>";					
+				}				
 				
 		}else {
-		  echo 'Patient '.$BrightreeID.': Not Updated : Error :' . $verify->getErrorMessage().'</br>';
+		  echo "<td>$BrightreeID</td><td>$firstname $lastname</td><td>Error : ". $verify->getErrorMessage()."</td>";		  
 		}
+		echo '</tr>';
 		$verify = NULL;
 	}
+		echo '</table>';
 }
 else {
-	echo 'No Patients Created from '.$startdate.' to '.$enddate;
+	echo 'No Patients Created b/w '.$startdate.' to '.$enddate;
 }
