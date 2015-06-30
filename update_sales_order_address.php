@@ -1,6 +1,8 @@
 <?php
 require_once("class/class.brighttreesalesorderservice.php");
 require_once('class/USPSAddressVerify.php');
+require_once('class/connection.php');
+
 
 $startdate = date('Y-m-d', strtotime("-1 days"));
 //$startdate = '2015-01-01';
@@ -95,6 +97,22 @@ if($records && ( count($records) > 0)) {
 			
 				$sales_order->children('b',true)->DeliveryInfo->children('b',true)->TaxZone->children('c',true)->ID = '2';
 			
+				
+				if($County) {
+					//look for county in database				
+					$result = mysql_query('select tax_code from county_taxzone_mapping where LOWER( county_taxzone_mapping.county ) = "'.strtolower($County).'"');
+					
+					if(! mysql_num_rows($result)) {
+						//set TaxZone 999 with id 9 if does not exist in the database
+						$sales_order->children('b',true)->DeliveryInfo->children('b',true)->TaxZone->children('c',true)->ID = '9';
+					}else{
+						//update taxzone value from database correspond to existing county
+						$value = mysql_fetch_object($result);
+						$UpdatedTaxZone = $value->tax_code;
+						$sales_order->children('b',true)->DeliveryInfo->children('b',true)->TaxZone->children('c',true)->ID = ((string) $UpdatedTaxZone);						
+					}
+				}				
+				
 				//$sales_order->children('b',true)->DeliveryInfo->children('b',true)->TaxZone->children('c',true)->Value = 'New Tax Zone';
 								
 				$SalesOrderObjXML= str_replace(

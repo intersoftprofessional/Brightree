@@ -1,0 +1,6 @@
+Configuration Steps:-
+
+1. Create database on your server and import database sql file (county_taxzone_mapping.sql).
+2. Update database host, database name, username, password in file connection.php located inside class directory (class/connection.php).
+3. Access file update_patient_address.php in browser to verify and update patient delivery address.
+4. Access file update_sales_order_address.php in browser to verify and update sales order delivery address.

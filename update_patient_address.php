@@ -1,8 +1,10 @@
 <?php
 require_once("class/class.brighttreepatientservice.php");
 require_once('class/USPSAddressVerify.php');
+require_once('class/connection.php');
 
 $startdate = date('Y-m-d', strtotime("-1 days"));
+//$startdate ='2015-01-01';
 $enddate = date('Y-m-d');
 
 //Initiate and set the username password provided from brighttree
@@ -74,8 +76,7 @@ if($records && ( count($records) > 0)) {
 		$lastname= (string) $patient_name_obj->Last;
 
 		
-		if($verify->isSuccess()) {		
-				
+		if($verify->isSuccess()) {
 		
 				//Now Update the correct deliveryAddress in the patient object		
 				
@@ -85,6 +86,17 @@ if($records && ( count($records) > 0)) {
 				$patient->children('b',true)->PatientGeneralInfo->children('b',true)->DeliveryAddress->children('c',true)->PostalCode =trim($correctAddress['AddressValidateResponse']['Address']['Zip5']);
 				$patient->children('b',true)->PatientGeneralInfo->children('b',true)->DeliveryAddress->children('c',true)->State =trim($correctAddress['AddressValidateResponse']['Address']['State']);
 
+				
+				if($County) {
+					//look for county in database				
+					$result = mysql_query('select tax_code from county_taxzone_mapping where LOWER( county_taxzone_mapping.county ) = "'.strtolower($County).'"');
+					
+
+					if(! mysql_num_rows($result)) {
+						//nil county value if does not exist in the database
+						$patient->children('b',true)->PatientGeneralInfo->children('b',true)->DeliveryAddress->children('c',true)->County='';
+					}
+				}
 
 				//unset unwanted objects from xml
 				unset($patient->BrightreeID);
