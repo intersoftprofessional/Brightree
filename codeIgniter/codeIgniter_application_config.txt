@@ -1,0 +1,14 @@
+CodeIgniter Application Configuration Steps:-
+
+1. Upload and extract zip file (CodeIgniter.zip) in your folder on server.
+2. Create your database and import sql file (skj_brightree_patient_app.sql) (located in CodeIgniter.zip file).
+3. Update base path of your folder on server in config file (application\config\config.php). Set base url in variable $config['base_url'] in config file.
+4. Update your database information in config database file (application\config\database.php) :-
+	a) $db['default']['hostname'] = ENTER YOUR DATABASE HOSTNAME
+    b) $db['default']['username'] = ENTER YOUR DATABASE USER
+    c) $db['default']['password'] = ENTER YOUR DATABASE USER'S PASSWORD
+	d) $db['default']['database'] = ENTER YOUR DATABASE NAME
+5. Access your base URL of your application in your browser.
+6. Initial login details:-
+	Username: admin@admin.com
+	Password: superadmin

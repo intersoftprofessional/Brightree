@@ -8,7 +8,8 @@ $startdate = date('Y-m-d', strtotime("-1 days"));
 $enddate = date('Y-m-d');
 
 //Initiate and set the username password provided from brighttree
-$obj = new BrighttreePatientService("https://webservices.brightree.net/v0100-1302/OrderEntryService/PatientService.svc","apiuser@GenevaWoodsSBX","gw2015!!");
+//$obj = new BrighttreePatientService("https://webservices.brightree.net/v0100-1302/OrderEntryService/PatientService.svc","apiuser@GenevaWoodsSBX","gw2015!!");
+$obj = new BrighttreePatientService("https://webservices.brightree.net/v0100-1302/OrderEntryService/PatientService.svc","shaeva@chspharmapitest","coffee4u");
 
 
 $result = $obj->PatientSearch($startdate,$enddate);

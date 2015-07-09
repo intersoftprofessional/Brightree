@@ -9,7 +9,8 @@ $startdate = date('Y-m-d', strtotime("-1 days"));
 $enddate = date('Y-m-d');
 
 //Initiate and set the username password provided from brighttree
-$obj = new BrighttreeSalesOrderService("https://webservices.brightree.net/v0100-1501/OrderEntryService/SalesOrderService.svc","apiuser@GenevaWoodsSBX","gw2015!!");
+//$obj = new BrighttreeSalesOrderService("https://webservices.brightree.net/v0100-1501/OrderEntryService/SalesOrderService.svc","apiuser@GenevaWoodsSBX","gw2015!!");
+$obj = new BrighttreeSalesOrderService("https://webservices.brightree.net/v0100-1501/OrderEntryService/SalesOrderService.svc","shaeva@chspharmapitest","coffee4u");
 
 
 $result = $obj->SalesOrderSearch($startdate,$enddate);
