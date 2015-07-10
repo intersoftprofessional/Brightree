@@ -136,6 +136,16 @@ if($records && ( count($records) > 0)) {
 				}
 				
 		}else {
+		  //nill sales order county if address is not verified
+		  $sales_order->children('b',true)->DeliveryInfo->children('b',true)->Address->children('c',true)->County='';		
+		  $SalesOrderObjXML= str_replace(
+			  array("<b:SalesOrder>","</b:SalesOrder>"),
+			  array("<SalesOrder>", "</SalesOrder>"),
+			  $sales_order->asXML()
+		  );
+		
+		  // Update sales order object on brighttree			
+		  $resultxml = simplexml_load_string((string) $obj->SalesOrderUpdate($BrightreeID,$SalesOrderObjXML));
 		  echo "<td>$BrightreeID</td><td>$sales_order_patient</td><td>$sales_order_status</td><td>Error : ". $verify->getErrorMessage()."</td>";		  
 		}
 		echo '</tr>';

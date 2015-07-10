@@ -121,6 +121,23 @@ if($records && ( count($records) > 0)) {
 				}				
 				
 		}else {
+		
+		  //nil county value if address is not verified
+		  $patient->children('b',true)->PatientGeneralInfo->children('b',true)->DeliveryAddress->children('c',true)->County='';
+		
+		  //unset unwanted objects from xml
+		  unset($patient->BrightreeID);
+		  unset($patient->ExternalID);
+
+		  $patientObjXML= str_replace(
+				array("<b:Patient>","</b:Patient>"),
+				array("<Patient>", "</Patient>"),
+				$patient->asXML()
+		  );
+		
+		  // Update patient object on brighttree			
+		  $resultxml = simplexml_load_string((string) $obj->PatientUpdate($BrightreeID,$patientObjXML));
+		
 		  echo "<td>$BrightreeID</td><td>$firstname $lastname</td><td>Error : ". $verify->getErrorMessage()."</td>";		  
 		}
 		echo '</tr>';
