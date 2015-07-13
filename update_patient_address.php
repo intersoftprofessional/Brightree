@@ -8,9 +8,8 @@ $startdate = date('Y-m-d', strtotime("-1 days"));
 $enddate = date('Y-m-d');
 
 //Initiate and set the username password provided from brighttree
-//$obj = new BrighttreePatientService("https://webservices.brightree.net/v0100-1302/OrderEntryService/PatientService.svc","apiuser@GenevaWoodsSBX","gw2015!!");
+// $obj = new BrighttreePatientService("https://webservices.brightree.net/v0100-1302/OrderEntryService/PatientService.svc","apiuser@GenevaWoodsSBX","gw2015!!");
 $obj = new BrighttreePatientService("https://webservices.brightree.net/v0100-1302/OrderEntryService/PatientService.svc","shaeva@chspharmapitest","coffee4u");
-
 
 $result = $obj->PatientSearch($startdate,$enddate);
 
@@ -60,8 +59,17 @@ if($records && ( count($records) > 0)) {
 		$address->setAddress(trim($AddressLine1));
 		$address->setCity(trim($City));
 		$address->setState(trim($State));
-		$address->setZip5(trim($PostalCode));
-		$address->setZip4('');
+		
+		if(strlen(trim($PostalCode)) > 4){ 
+					//if postal code is greater then 4 then send first 5 char in Zip5
+					$address->setZip5(substr(trim($PostalCode), 0, 5));
+					$address->setZip4('');
+		}else{
+					//else send first 4 in Zip4
+					$address->setZip5('');
+					$address->setZip4(trim($PostalCode));
+					
+		}
 
 		// Add the address object to the address verify class
 		$verify->addAddress($address);
@@ -87,6 +95,15 @@ if($records && ( count($records) > 0)) {
 				$patient->children('b',true)->PatientGeneralInfo->children('b',true)->DeliveryAddress->children('c',true)->PostalCode =trim($correctAddress['AddressValidateResponse']['Address']['Zip5']);
 				$patient->children('b',true)->PatientGeneralInfo->children('b',true)->DeliveryAddress->children('c',true)->State =trim($correctAddress['AddressValidateResponse']['Address']['State']);
 
+				//remove nil from elements
+				unset($patient->children('b', true)->PatientGeneralInfo->children('b', true)->DeliveryAddress->children('c', true)->AddressLine1->attributes('i',true)->nil);														
+				unset($patient->children('b', true)->PatientGeneralInfo->children('b', true)->DeliveryAddress->children('c', true)->AddressLine2->attributes('i',true)->nil);														
+				unset($patient->children('b', true)->PatientGeneralInfo->children('b', true)->DeliveryAddress->children('c', true)->City->attributes('i',true)->nil);														
+				unset($patient->children('b', true)->PatientGeneralInfo->children('b', true)->DeliveryAddress->children('c', true)->PostalCode->attributes('i',true)->nil);														
+				unset($patient->children('b', true)->PatientGeneralInfo->children('b', true)->DeliveryAddress->children('c', true)->State->attributes('i',true)->nil);						
+				unset($patient->children('b', true)->PatientGeneralInfo->children('b', true)->DeliveryAddress->children('c', true)->County->attributes('i',true)->nil);						
+					
+				
 				
 				if($County) {
 					//look for county in database				
@@ -139,7 +156,7 @@ if($records && ( count($records) > 0)) {
 		  $resultxml = simplexml_load_string((string) $obj->PatientUpdate($BrightreeID,$patientObjXML));
 		
 		  echo "<td>$BrightreeID</td><td>$firstname $lastname</td><td>Error : ". $verify->getErrorMessage()."</td>";		  
-		}
+	  }
 		echo '</tr>';
 		$verify = NULL;
 	}

@@ -5,11 +5,12 @@ require_once('class/connection.php');
 
 
 $startdate = date('Y-m-d', strtotime("-1 days"));
-//$startdate = '2015-01-01';
+//$startdate = '2015-07-08';
 $enddate = date('Y-m-d');
+//$enddate = '2015-07-10';
 
 //Initiate and set the username password provided from brighttree
-//$obj = new BrighttreeSalesOrderService("https://webservices.brightree.net/v0100-1501/OrderEntryService/SalesOrderService.svc","apiuser@GenevaWoodsSBX","gw2015!!");
+// $obj = new BrighttreeSalesOrderService("https://webservices.brightree.net/v0100-1501/OrderEntryService/SalesOrderService.svc","apiuser@GenevaWoodsSBX","gw2015!!");
 $obj = new BrighttreeSalesOrderService("https://webservices.brightree.net/v0100-1501/OrderEntryService/SalesOrderService.svc","shaeva@chspharmapitest","coffee4u");
 
 
@@ -71,8 +72,17 @@ if($records && ( count($records) > 0)) {
 		$address->setAddress(trim($AddressLine1));
 		$address->setCity(trim($City));
 		$address->setState(trim($State));
-		$address->setZip5(trim($PostalCode));
-		$address->setZip4('');
+		
+		if(strlen(trim($PostalCode)) > 4){ 
+			//if postal code is greater then 4 then send first 5 char in Zip5
+			$address->setZip5(substr(trim($PostalCode), 0, 5));
+			$address->setZip4('');
+		}else{
+			//else send first 4 in Zip4
+			$address->setZip5('');
+			$address->setZip4(trim($PostalCode));
+		}
+		
 
 		// Add the address object to the address verify class
 		$verify->addAddress($address);
@@ -86,19 +96,21 @@ if($records && ( count($records) > 0)) {
 			
 			//Now Update the correct deliveryAddress in the sales order object		
 				
-				$sales_order->children('b',true)->DeliveryInfo->children('b',true)->Address->children('c',true)->AddressLine1 = (isset($correctAddress['AddressValidateResponse']['Address']['Address2'])) ? trim($correctAddress['AddressValidateResponse']['Address']['Address2']) : '';
-				
-				$sales_order->children('b',true)->DeliveryInfo->children('b',true)->Address->children('c',true)->AddressLine2 = (isset($correctAddress['AddressValidateResponse']['Address']['Address1'])) ? trim($correctAddress['AddressValidateResponse']['Address']['Address1']) : '';
-				
-				$sales_order->children('b',true)->DeliveryInfo->children('b',true)->Address->children('c',true)->City = trim($correctAddress['AddressValidateResponse']['Address']['City']);				
-				
-				$sales_order->children('b',true)->DeliveryInfo->children('b',true)->Address->children('c',true)->PostalCode =trim($correctAddress['AddressValidateResponse']['Address']['Zip5']);
-				
-				$sales_order->children('b',true)->DeliveryInfo->children('b',true)->Address->children('c',true)->State =trim($correctAddress['AddressValidateResponse']['Address']['State']);
-			
+				$sales_order->children('b',true)->DeliveryInfo->children('b',true)->Address->children('c',true)->AddressLine1 = (isset($correctAddress['AddressValidateResponse']['Address']['Address2'])) ? trim($correctAddress['AddressValidateResponse']['Address']['Address2']) : '';				
+				$sales_order->children('b',true)->DeliveryInfo->children('b',true)->Address->children('c',true)->AddressLine2 = (isset($correctAddress['AddressValidateResponse']['Address']['Address1'])) ? trim($correctAddress['AddressValidateResponse']['Address']['Address1']) : '';				
+				$sales_order->children('b',true)->DeliveryInfo->children('b',true)->Address->children('c',true)->City = trim($correctAddress['AddressValidateResponse']['Address']['City']);								
+				$sales_order->children('b',true)->DeliveryInfo->children('b',true)->Address->children('c',true)->PostalCode =trim($correctAddress['AddressValidateResponse']['Address']['Zip5']);				
+				$sales_order->children('b',true)->DeliveryInfo->children('b',true)->Address->children('c',true)->State =trim($correctAddress['AddressValidateResponse']['Address']['State']);			
 				$sales_order->children('b',true)->DeliveryInfo->children('b',true)->TaxZone->children('c',true)->ID = '2';
 			
-				
+				//remove nil from elements
+				unset($sales_order->children('b',true)->DeliveryInfo->children('b',true)->Address->children('c',true)->AddressLine1->attributes('i',true)->nil);														
+				unset($sales_order->children('b',true)->DeliveryInfo->children('b',true)->Address->children('c',true)->AddressLine2->attributes('i',true)->nil);														
+				unset($sales_order->children('b',true)->DeliveryInfo->children('b',true)->Address->children('c',true)->City->attributes('i',true)->nil);														
+				unset($sales_order->children('b',true)->DeliveryInfo->children('b',true)->Address->children('c',true)->PostalCode->attributes('i',true)->nil);														
+				unset($sales_order->children('b',true)->DeliveryInfo->children('b',true)->Address->children('c',true)->State->attributes('i',true)->nil);
+				unset($sales_order->children('b',true)->DeliveryInfo->children('b',true)->TaxZone->children('c',true)->ID->attributes('i',true)->nil);					
+											
 				if($County) {
 					//look for county in database				
 					$result = mysql_query('select tax_code from county_taxzone_mapping where LOWER( county_taxzone_mapping.county ) = "'.strtolower($County).'"');
