@@ -113,16 +113,25 @@ if($records && ( count($records) > 0)) {
 											
 				if($County) {
 					//look for county in database				
-					$result = mysql_query('select tax_code from county_taxzone_mapping where LOWER( county_taxzone_mapping.county ) = "'.strtolower($County).'"');
+					$result = mysql_query('select taxzone_ID from county_taxzone_mapping where LOWER( county_taxzone_mapping.county ) = "'.strtolower($County).'"');
 					
 					if(! mysql_num_rows($result)) {
+						unset($sales_order->children('b',true)->DeliveryInfo->children('b',true)->TaxZone->attributes('i',true)->nil);
 						//set TaxZone 999 with id 9 if does not exist in the database
-						$sales_order->children('b',true)->DeliveryInfo->children('b',true)->TaxZone->children('c',true)->ID = '9';
+						$sales_order->children('b',true)->DeliveryInfo->children('b',true)->TaxZone->children('c',true)->ID = '369';
 					}else{
 						//update taxzone value from database correspond to existing county
 						$value = mysql_fetch_object($result);
-						$UpdatedTaxZone = $value->tax_code;
-						$sales_order->children('b',true)->DeliveryInfo->children('b',true)->TaxZone->children('c',true)->ID = ((string) $UpdatedTaxZone);						
+						$UpdatedTaxZone = $value->taxzone_ID;
+						
+						if(isset($sales_order->children('b',true)->DeliveryInfo->children('b',true)->TaxZone->children('c',true)->ID)){
+								//update value if already set									
+								$sales_order->children('b',true)->DeliveryInfo->children('b',true)->TaxZone->children('c',true)->ID = ((string) $UpdatedTaxZone);
+						}else{
+									//add element if not set
+									unset($sales_order->children('b',true)->DeliveryInfo->children('b',true)->TaxZone->attributes('i',true)->nil);	
+									$sales_order->children('b',true)->DeliveryInfo->children('b',true)->TaxZone->addChild('c:ID',((string) $UpdatedTaxZone),'http://schemas.datacontract.org/2004/07/Brightree.ExternalAPI.CanonicalObjects.Common');
+						}
 					}
 				}				
 				

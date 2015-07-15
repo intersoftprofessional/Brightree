@@ -107,12 +107,25 @@ if($records && ( count($records) > 0)) {
 				
 				if($County) {
 					//look for county in database				
-					$result = mysql_query('select tax_code from county_taxzone_mapping where LOWER( county_taxzone_mapping.county ) = "'.strtolower($County).'"');
+					$result = mysql_query('select taxzone_ID from county_taxzone_mapping where LOWER( county_taxzone_mapping.county ) = "'.strtolower($County).'"');
 					
 
 					if(! mysql_num_rows($result)) {
 						//nil county value if does not exist in the database
 						$patient->children('b',true)->PatientGeneralInfo->children('b',true)->DeliveryAddress->children('c',true)->County='';
+					}else{					
+						// update TaxZone
+							$value = mysql_fetch_object($result);
+							$UpdatedTaxZone = $value->taxzone_ID;
+
+							if(isset($patient->children('b',true)->PatientGeneralInfo->children('b',true)->TaxZone->children('c',true)->ID)) {
+								//update value if already set
+								$patient->children('b',true)->PatientGeneralInfo->children('b',true)->TaxZone->children('c',true)->ID = ((string) $UpdatedTaxZone);
+							}else	{
+								//add element if already not set
+								unset($patient->children('b',true)->PatientGeneralInfo->children('b',true)->TaxZone->attributes('i',true)->nil);
+								$patient->children('b',true)->PatientGeneralInfo->children('b',true)->TaxZone->addChild('c:ID', ((string) $UpdatedTaxZone),'http://schemas.datacontract.org/2004/07/Brightree.ExternalAPI.CanonicalObjects.Common');
+							}
 					}
 				}
 
