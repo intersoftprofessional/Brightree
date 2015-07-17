@@ -4,8 +4,9 @@ require_once('class/USPSAddressVerify.php');
 require_once('class/connection.php');
 
 $startdate = date('Y-m-d', strtotime("-1 days"));
-//$startdate ='2015-01-01';
+//$startdate ='2015-07-13';
 $enddate = date('Y-m-d');
+//$enddate ='2015-07-14';
 
 //Initiate and set the username password provided from brighttree
 // $obj = new BrighttreePatientService("https://webservices.brightree.net/v0100-1302/OrderEntryService/PatientService.svc","apiuser@GenevaWoodsSBX","gw2015!!");
@@ -113,19 +114,25 @@ if($records && ( count($records) > 0)) {
 					if(! mysql_num_rows($result)) {
 						//nil county value if does not exist in the database
 						$patient->children('b',true)->PatientGeneralInfo->children('b',true)->DeliveryAddress->children('c',true)->County='';
-					}else{					
-						// update TaxZone
+					}else{				
+						if(mysql_num_rows($result) > 1) {
+							//multiple records then update 999 taxzone
+							$UpdatedTaxZone = '369';
+						}else{
+							//If single record then update it
 							$value = mysql_fetch_object($result);
-							$UpdatedTaxZone = $value->taxzone_ID;
-
-							if(isset($patient->children('b',true)->PatientGeneralInfo->children('b',true)->TaxZone->children('c',true)->ID)) {
-								//update value if already set
-								$patient->children('b',true)->PatientGeneralInfo->children('b',true)->TaxZone->children('c',true)->ID = ((string) $UpdatedTaxZone);
-							}else	{
-								//add element if already not set
-								unset($patient->children('b',true)->PatientGeneralInfo->children('b',true)->TaxZone->attributes('i',true)->nil);
-								$patient->children('b',true)->PatientGeneralInfo->children('b',true)->TaxZone->addChild('c:ID', ((string) $UpdatedTaxZone),'http://schemas.datacontract.org/2004/07/Brightree.ExternalAPI.CanonicalObjects.Common');
-							}
+							$UpdatedTaxZone = $value->taxzone_ID;							
+						}
+						
+						// update TaxZone
+						if(isset($patient->children('b',true)->PatientGeneralInfo->children('b',true)->TaxZone->children('c',true)->ID)) {
+							//update value if already set
+							$patient->children('b',true)->PatientGeneralInfo->children('b',true)->TaxZone->children('c',true)->ID = ((string) $UpdatedTaxZone);
+						}else	{
+							//add element if already not set
+							unset($patient->children('b',true)->PatientGeneralInfo->children('b',true)->TaxZone->attributes('i',true)->nil);
+							$patient->children('b',true)->PatientGeneralInfo->children('b',true)->TaxZone->addChild('c:ID', ((string) $UpdatedTaxZone),'http://schemas.datacontract.org/2004/07/Brightree.ExternalAPI.CanonicalObjects.Common');
+						}
 					}
 				}
 

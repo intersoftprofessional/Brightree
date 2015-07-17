@@ -120,10 +120,17 @@ if($records && ( count($records) > 0)) {
 						//set TaxZone 999 with id 9 if does not exist in the database
 						$sales_order->children('b',true)->DeliveryInfo->children('b',true)->TaxZone->children('c',true)->ID = '369';
 					}else{
+						if(mysql_num_rows($result) > 1) {
+							//multiple records then update 999 taxzone
+							$UpdatedTaxZone = '369';
+						}else{
+							//If single record then update it
+							$value = mysql_fetch_object($result);
+							$UpdatedTaxZone = $value->taxzone_ID;							
+						}
+					
+					
 						//update taxzone value from database correspond to existing county
-						$value = mysql_fetch_object($result);
-						$UpdatedTaxZone = $value->taxzone_ID;
-						
 						if(isset($sales_order->children('b',true)->DeliveryInfo->children('b',true)->TaxZone->children('c',true)->ID)){
 								//update value if already set									
 								$sales_order->children('b',true)->DeliveryInfo->children('b',true)->TaxZone->children('c',true)->ID = ((string) $UpdatedTaxZone);
