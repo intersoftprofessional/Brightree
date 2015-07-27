@@ -108,7 +108,7 @@ if($records && ( count($records) > 0)) {
 				
 				if($County) {
 					//look for county in database				
-					$result = mysql_query('select taxzone_ID from county_taxzone_mapping where LOWER( county_taxzone_mapping.county ) = "'.strtolower($County).'"');
+					$result = mysql_query('select taxzone_ID from county_taxzone_mapping where LOWER( county_taxzone_mapping.county ) = "'.strtolower($County).'" AND published="1"');
 					
 
 					if(! mysql_num_rows($result)) {
