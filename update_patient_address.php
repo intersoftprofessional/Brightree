@@ -106,7 +106,13 @@ if($records && ( count($records) > 0)) {
 					
 				
 				
-				if($County) {
+				if($County || ($State && strtolower($State) != "washington")) {
+					//if county exist or state of patient is not washington							
+					if(! $County){
+						//if county is nil then add state as county to search taxzones
+						$County=$State;
+					}
+					
 					//look for county in database				
 					$result = mysql_query('select taxzone_ID from county_taxzone_mapping where LOWER( county_taxzone_mapping.county ) = "'.strtolower($County).'" AND published="1"');
 					

@@ -111,7 +111,13 @@ if($records && ( count($records) > 0)) {
 				unset($sales_order->children('b',true)->DeliveryInfo->children('b',true)->Address->children('c',true)->State->attributes('i',true)->nil);
 				unset($sales_order->children('b',true)->DeliveryInfo->children('b',true)->TaxZone->children('c',true)->ID->attributes('i',true)->nil);					
 											
-				if($County) {
+				if($County || ($State && strtolower($State) != "washington")) {
+					//if county exist or state of patient is not washington							
+					if(! $County){
+						//if county is nil then add state as county to search taxzones
+						$County=$State;
+					}
+					
 					//look for county in database				
 					$result = mysql_query('select taxzone_ID from county_taxzone_mapping where LOWER( county_taxzone_mapping.county ) = "'.strtolower($County).'" AND published="1"');
 					
